@@ -5,7 +5,7 @@ import { registerStudent, loginStudent, loginAdmin } from '../api';
 export default function Login({ onStudentLogin, onAdminLogin }) {
   const [mode, setMode] = useState('student'); // 'student' or 'admin'
   const [studentMode, setStudentMode] = useState('login'); // 'register' or 'login'
-  
+  //
   // Student fields
   const [studentName, setStudentName] = useState('');
   const [preferredCall, setPreferredCall] = useState('');
