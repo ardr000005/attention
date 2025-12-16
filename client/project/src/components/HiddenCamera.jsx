@@ -63,6 +63,18 @@ export default function HiddenCamera({ onLandmarks, isActive, studentId }) {
 
         faceMeshRef.current = faceMesh;
 
+        // Prefer native getUserMedia to ensure permission prompt on HTTPS
+        const constraints = { video: { width: 640, height: 480 }, audio: false };
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia(constraints);
+          videoElement.srcObject = stream;
+          await videoElement.play().catch(() => {});
+        } catch (permErr) {
+          console.error('getUserMedia error:', permErr);
+          setError('Camera permission denied. Please allow camera access.');
+          return;
+        }
+
         const camera = new CameraCtor(videoElement, {
           onFrame: async () => {
             if (!stopped && faceMeshRef.current && videoElement.readyState === 4) {
@@ -89,6 +101,10 @@ export default function HiddenCamera({ onLandmarks, isActive, studentId }) {
       stopped = true;
       if (cameraRef.current) {
         try { cameraRef.current.stop(); } catch {}
+      }
+      const stream = videoElement?.srcObject;
+      if (stream && typeof stream.getTracks === 'function') {
+        stream.getTracks().forEach(t => t.stop());
       }
     };
   }, [isActive, studentId, onLandmarks]);
